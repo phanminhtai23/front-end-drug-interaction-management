@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, Button, message } from "antd";
 import {
     GoogleOutlined,
@@ -8,23 +8,67 @@ import {
     MailOutlined,
 } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
+import userService from "../services/userService";
 
 const RegisterPage = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+
 
     const onFinish = async (values) => {
         try {
-            // Xử lý đăng ký
-            // Kết nối với backend hoặc Firebase Authentication
-            navigate("/dashboard");
+            setLoading(true);
+            // Gọi API đăng nhập sử dụng userService
+            const response = await userService.register({
+                email: values.email,
+                full_name: values.fullName,
+                password: values.password,
+            });
+
+            console.log("respon:", response);
+            // Lưu token vào localStorage
+            // localStorage.setItem("token", response.access_token);
+
+            // Hiển thị thông báo thành công
+            message.success("Đăng ký thành công!");
+
+            // Chuyển hướng đến trang dashboard
+            navigate("/admin/auth/login");
         } catch (error) {
-            message.error("Đăng ký thất bại");
+            // Xử lý các loại lỗi và hiển thị popup
+            let msg = "Đăng ký thất bại";
+
+            if (error.response) {
+                // Lỗi từ server
+                if (error.response.status === 401) {
+                    msg = error.response.data.detail;
+                } else if (error.response.data && error.response.data.detail) {
+                    msg = error.response.data.detail;
+                }
+            } else if (error.request) {
+                // Lỗi kết nối
+                msg = "Không thể kết nối đến máy chủ";
+            }
+
+            // Hiển thị popup thông báo lỗi
+            // Hiển thị popup ở góc trên bên trái trong 3s
+            console.log("Error message:", msg);
+            message.warning({
+                // type: "error",
+                content: msg,
+                duration: 2,
+                // style: { position: "fixed", top: "20px", left: "20px" },
+            });
+
+            console.error("Lỗi đăng ký:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleGoogleRegister = async () => {
         try {
-            navigate("/dashboard");
+            navigate("/admin/auth/login");
         } catch (error) {
             message.error("Đăng ký Google thất bại");
         }
@@ -32,7 +76,7 @@ const RegisterPage = () => {
 
     const handleFacebookRegister = async () => {
         try {
-            navigate("/dashboard");
+            navigate("/admin/auth/login");
         } catch (error) {
             message.error("Đăng ký Facebook thất bại");
         }
@@ -159,6 +203,7 @@ const RegisterPage = () => {
                                 htmlType="submit"
                                 block
                                 className="h-12 rounded-lg bg-green-600 hover:bg-green-700 transition"
+                                loading={loading}
                             >
                                 Đăng Ký
                             </Button>
@@ -200,7 +245,7 @@ const RegisterPage = () => {
                         <p className="text-gray-600">
                             Đã có tài khoản?{" "}
                             <Link
-                                to="/login"
+                                to="/admin/auth/login"
                                 className="text-green-600 hover:text-green-800 font-semibold transition"
                             >
                                 Đăng nhập ngay

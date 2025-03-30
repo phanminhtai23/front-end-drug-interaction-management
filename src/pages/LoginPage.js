@@ -1,44 +1,129 @@
-import React from "react";
-import { Form, Input, Button, message } from "antd";
+import React, { useState } from "react";
+import { Form, Input, Button, message, Modal, Alert } from "antd";
 import {
     GoogleOutlined,
     FacebookOutlined,
     LockOutlined,
     UserOutlined,
+    ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
+import userService from "../services/userService";
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [errorVisible, setErrorVisible] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    
 
     const onFinish = async (values) => {
         try {
-            // Xử lý đăng nhập bằng email/password
-            // Kết nối với backend hoặc Firebase Authentication
-            navigate("/dashboard");
+            setLoading(true);
+            // Gọi API đăng nhập sử dụng userService
+            const response = await userService.login({
+                email: values.email,
+                password: values.password,
+                device_info: navigator.userAgent,
+            });
+
+            console.log("respon:", response);
+            // Lưu token vào localStorage
+            localStorage.setItem("token", response.access_token);
+
+            // Chuyển hướng đến trang dashboard
+            navigate("/admin/dashboard");
         } catch (error) {
-            message.error("Đăng nhập thất bại");
+            // Xử lý các loại lỗi và hiển thị popup
+            let msg = "Đăng nhập thất bại";
+            console.log("respon:", error.response);
+
+            if (error.response) {
+                // Lỗi từ server
+                if (error.response.status === 401) {
+                    msg = error.response.data.detail || "Sai tên đăng nhập hoặc mật khẩu";
+                        
+                        
+                } else if (error.response.status === 404) {
+                    msg = error.response.data.detail || "Email chưa được đăng ký";
+                }
+            } else if (error.request) {
+                // Lỗi kết nối
+                msg = "Không thể kết nối đến máy chủ";
+            }
+
+            // Hiển thị popup thông báo lỗi
+            // Hiển thị popup ở góc trên bên trái trong 3s
+            console.log("Error message:", msg);
+            message.warning({
+                // type: "error",
+                content: msg,
+                duration: 2,
+                // style: { position: "fixed", top: "20px", left: "20px" },
+            });
+
+            console.error("Lỗi đăng nhập:", error);
+        } finally {
+            setLoading(false);
         }
+    };
+
+    // Đóng popup lỗi
+    const handleErrorClose = () => {
+        setErrorVisible(false);
     };
 
     const handleGoogleLogin = async () => {
         try {
-            navigate("/dashboard");
+            // Phần này cần tích hợp với Google OAuth
+            message.info("Đang chuyển hướng đến đăng nhập Google...");
+            navigate("/admin/dashboard");
         } catch (error) {
-            message.error("Đăng nhập Google thất bại");
+            setErrorMessage("Đăng nhập Google thất bại");
+            setErrorVisible(true);
         }
     };
 
     const handleFacebookLogin = async () => {
         try {
-            navigate("/dashboard");
+            // Phần này cần tích hợp với Facebook OAuth
+            message.info("Đang chuyển hướng đến đăng nhập Facebook...");
+            navigate("/admin/dashboard");
         } catch (error) {
-            message.error("Đăng nhập Facebook thất bại");
+            setErrorMessage("Đăng nhập Facebook thất bại");
+            setErrorVisible(true);
         }
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center px-4">
+            {/* Popup thông báo lỗi */}
+            <Modal
+                title={
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                        <ExclamationCircleOutlined
+                            style={{ color: "#ff4d4f", marginRight: 8 }}
+                        />
+                        <span>Lỗi đăng nhập</span>
+                    </div>
+                }
+                open={errorVisible}
+                onCancel={handleErrorClose}
+                footer={[
+                    <Button key="ok" type="primary" onClick={handleErrorClose}>
+                        Đồng ý
+                    </Button>,
+                ]}
+                centered
+            >
+                <Alert
+                    message={errorMessage}
+                    type="error"
+                    showIcon
+                    style={{ marginBottom: 0 }}
+                />
+            </Modal>
+
             <div className="bg-white shadow-2xl rounded-2xl overflow-hidden w-full max-w-md">
                 <div className="p-8">
                     <div className="text-center mb-8">
@@ -57,11 +142,15 @@ const LoginPage = () => {
                         layout="vertical"
                     >
                         <Form.Item
-                            name="username"
+                            name="email"
                             rules={[
                                 {
                                     required: true,
-                                    message: "Vui lòng nhập tên đăng nhập!",
+                                    message: "Vui lòng nhập email đã đăng ký!",
+                                },
+                                {
+                                    type: "email",
+                                    message: "Định dạng email không hợp lệ!",
                                 },
                             ]}
                         >
@@ -107,6 +196,7 @@ const LoginPage = () => {
                                 htmlType="submit"
                                 block
                                 className="h-12 rounded-lg bg-blue-600 hover:bg-blue-700 transition"
+                                loading={loading}
                             >
                                 Đăng Nhập
                             </Button>
@@ -148,7 +238,7 @@ const LoginPage = () => {
                         <p className="text-gray-600">
                             Chưa có tài khoản?{" "}
                             <Link
-                                to="/register"
+                                to="/admin/auth/register"
                                 className="text-blue-600 hover:text-blue-800 font-semibold transition"
                             >
                                 Đăng ký ngay

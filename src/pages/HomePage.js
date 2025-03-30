@@ -28,13 +28,13 @@ const HomePage = () => {
                     </div>
                     <nav>
                         <Link
-                            to="/login"
+                            to="/admin/auth/login"
                             className="bg-blue-600 text-white px-4 py-2 rounded-md mr-2 hover:bg-blue-700"
                         >
                             Đăng Nhập
                         </Link>
                         <Link
-                            to="/register"
+                            to="/admin/auth/register"
                             className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
                         >
                             Đăng Ký
