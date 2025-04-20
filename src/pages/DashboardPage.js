@@ -57,9 +57,9 @@ const AdminDashboard = () => {
     }
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen fixed-sidebar ">
             {/* Enhanced Sidebar */}
-            <div className="w-64 bg-gradient-to-b from-gray-800 to-gray-900 text-white flex flex-col">
+            <div className="w-64 bg-gradient-to-b from-gray-800 to-gray-900 text-white flex flex-col caret-transparent">
                 <div className="h-16 flex items-center justify-center bg-gray-900 text-lg font-semibold border-b border-gray-700">
                     Quản Trị Hệ Thống
                 </div>
@@ -102,12 +102,11 @@ const AdminDashboard = () => {
                 </nav>
 
                 {/* Logout Section */}
-                <div className="p-4 border-t border-gray-700">
+                <div className="p-4 border-t border-gray-700 fixed-bottom">
                     <button
                         className="flex items-center w-full p-3 hover:bg-white hover:text-black rounded-lg"
                         onClick={() => {
-                            LogoutLogic()
-
+                            LogoutLogic();
                         }}
                     >
                         <LogOut className="mr-3 text-red-500" />

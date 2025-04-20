@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import Modal from "./Modal";
+import {CompactModal } from "../Modals/UserModal"; 
 import { Edit, Trash2, Eye} from "lucide-react";
 // import axiosClient from "../../services/axiosClient";
 import userService from "../../services/userService";
 import { message } from "antd"; // Assuming you're using Ant Design for messages
 import {LoadingData} from "../loading";
-
+import ReactPaginate from "react-paginate";
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -16,7 +16,26 @@ const UserManagement = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 20;
 
+
+
+
+        const handlePageChange = ({ selected }) => {
+            setCurrentPage(selected);
+        };
+    const filteredMedicines = users.filter(
+        (users) =>
+            users.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            users.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            users.role?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const pageCount = Math.ceil(filteredMedicines.length / itemsPerPage);
+   const currentUsers = filteredMedicines.slice(
+       currentPage * itemsPerPage,
+       (currentPage + 1) * itemsPerPage
+   );
     // Fetch users data when component mounts
     useEffect(() => {
         fetchUsers();
@@ -111,16 +130,16 @@ const UserManagement = () => {
         }
     };
 
-    // In the filteredUsers function, remove username from the search
-    const filteredUsers = users.filter(
-        (user) =>
-            user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // // In the filteredUsers function, remove username from the search
+    // const filteredUsers = users.filter(
+    //     (user) =>
+    //         user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //         user.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    // );
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4 caret-transparent">
                 <h2 className="text-2xl font-bold">Quản Lý Người Dùng</h2>
             </div>
 
@@ -137,9 +156,11 @@ const UserManagement = () => {
             {loading ? (
                 <LoadingData />
             ) : error ? (
-                <div className="text-center py-4 text-red-500">{error}</div>
+                <div className="text-center py-4 text-red-500 caret-transparent">
+                    {error}
+                </div>
             ) : (
-                <table className="w-full border-collapse">
+                <table className="w-full border-collapse caret-transparent">
                     <thead>
                         <tr className="bg-gray-200">
                             <th className="border p-2">Họ và Tên</th>
@@ -149,8 +170,8 @@ const UserManagement = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredUsers.length > 0 ? (
-                            filteredUsers.map((user, index) => (
+                        {currentUsers.length > 0 ? (
+                            currentUsers.map((user, index) => (
                                 <tr key={index}>
                                     <td className="border p-2">
                                         {user.full_name}
@@ -197,7 +218,68 @@ const UserManagement = () => {
                 </table>
             )}
 
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+            <div className="fixed bottom-4 left-1/2 transform -translate-x-1 bg-white shadow-lg rounded-full p-2 border border-gray-200">
+                <ReactPaginate
+                    previousLabel={
+                        <span className="flex items-center justify-center">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 19l-7-7 7-7"
+                                />
+                            </svg>
+                        </span>
+                    }
+                    nextLabel={
+                        <span className="flex items-center justify-center">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                        </span>
+                    }
+                    pageCount={pageCount}
+                    onPageChange={handlePageChange}
+                    marginPagesDisplayed={1}
+                    pageRangeDisplayed={3}
+                    containerClassName="flex items-center space-x-2 text-sm mb-0 select-none"
+                    pageClassName="select-none"
+                    pageLinkClassName="flex items-center justify-center w-8 h-8 rounded-full border border-gray-200 hover:bg-gray-50 transition duration-300 select-none focus:outline-none"
+                    previousClassName="select-none"
+                    nextClassName="select-none"
+                    previousLinkClassName="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition duration-300 select-none focus:outline-none"
+                    nextLinkClassName="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 !hover:bg-gray-200 transition duration-300 select-none focus:outline-none"
+                    disabledClassName="opacity-40 cursor-not-allowed"
+                    activeClassName=""
+                    activeLinkClassName="!bg-blue-500 !text-white !border-blue-500 hover:!bg-blue-600"
+                    breakLabel="..."
+                    breakClassName="select-none"
+                    breakLinkClassName="flex items-center justify-center w-8 h-8 text-gray-400 select-none focus:outline-none"
+                />
+            </div>
+
+            <CompactModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            >
                 {modalMode === "view" && selectedUser && (
                     <div>
                         <h3 className="text-xl font-bold mb-4">
@@ -292,7 +374,7 @@ const UserManagement = () => {
                         </div>
                     </div>
                 )}
-            </Modal>
+            </CompactModal>
         </div>
     );
 };

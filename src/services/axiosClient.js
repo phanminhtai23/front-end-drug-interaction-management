@@ -1,5 +1,6 @@
 // api/axiosClient.js
 import axios from "axios";
+import {message } from "antd";
 
 const axiosClient = axios.create({
     baseURL: process.env.REACT_APP_BASE_BACKEND_URL, // Thay đổi URL API của bạn
@@ -34,7 +35,10 @@ axiosClient.interceptors.response.use(
             if (error.response.status === 401) {
                 // Unauthorized - có thể logout user
                 localStorage.removeItem("token");
-                // window.location.href = '/login';
+                window.location.href = '/admin/auth/login'; // Chuyển hướng đến trang đăng nhập
+                message.warning({
+                    content: "Phiên làm việc đã hết hạn, vui lòng đăng nhập lại!",
+                });
             }
         }
         return Promise.reject(error);

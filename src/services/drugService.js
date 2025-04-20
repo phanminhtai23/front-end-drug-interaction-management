@@ -14,12 +14,12 @@ const drugService = {
 
     // Trích thông tin từ document
     extract: (document_urls) => {
-        return axiosClient.get(`/drugs/extract`, document_urls);
+        return axiosClient.post(`/drugs/extract`, document_urls);
     },
 
     // Cập nhật thông tin thuốc
-    update: (drug_id) => {
-        return axiosClient.put(`/drugs/${drug_id}`);
+    update: (drug_id, drug) => {
+        return axiosClient.put(`/drugs/${drug_id}`, drug);
     },
 
     // Xóa thuốc

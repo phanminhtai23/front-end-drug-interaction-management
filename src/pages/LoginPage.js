@@ -183,7 +183,7 @@ const LoginPage = () => {
 
                         <div className="flex justify-between items-center mb-6">
                             <Link
-                                to="/forgot-password"
+                                to="/admin/forgot-password"
                                 className="text-blue-600 hover:text-blue-800 transition"
                             >
                                 Quên mật khẩu?
@@ -203,7 +203,7 @@ const LoginPage = () => {
                         </Form.Item>
                     </Form>
 
-                    <div className="relative my-6">
+                    {/* <div className="relative my-6">
                         <div className="absolute inset-0 flex items-center">
                             <div className="w-full border-t border-gray-300"></div>
                         </div>
@@ -244,7 +244,7 @@ const LoginPage = () => {
                                 Đăng ký ngay
                             </Link>
                         </p>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

@@ -3,8 +3,13 @@ import axiosClient from "./axiosClient";
 
 const ddiService = {
     // Lấy tất cả các tương tác thuốc
-    getAll: (params) => {
-        return axiosClient.get("/ddi", { params });
+    getAll: () => {
+        return axiosClient.get("/ddi");
+    },
+
+    // Tạo mới thông tin tương tác thuốc
+    create: (ddi) => {
+        return axiosClient.post("/ddi", 1);
     },
 
     // Lấy chi tiết tương tác thuốc
@@ -12,24 +17,18 @@ const ddiService = {
         return axiosClient.get(`/ddi/${id}`);
     },
 
-    // Kiểm tra tương tác giữa các thuốc
-    checkInteraction: (drugIds) => {
-        return axiosClient.post("/ddi/check", { drugIds });
-    },
-
-    // Tạo mới thông tin tương tác thuốc
-    create: (data) => {
-        return axiosClient.post("/ddi", data);
+    extract: (document_urls) => {
+        return axiosClient.post(`/ddi/extract`, document_urls);
     },
 
     // Cập nhật thông tin tương tác thuốc
-    update: (id, data) => {
-        return axiosClient.put(`/ddi/${id}`, data);
+    update: (ddi_id, ddi) => {
+        return axiosClient.put(`/ddi/${ddi_id}`, ddi);
     },
 
     // Xóa thông tin tương tác thuốc
-    delete: (id) => {
-        return axiosClient.delete(`/ddi/${id}`);
+    delete: (ddi_id) => {
+        return axiosClient.delete(`/ddi/${ddi_id}`);
     },
 };
 
