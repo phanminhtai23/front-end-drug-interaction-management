@@ -132,7 +132,7 @@ const DrugInteractionManagement = () => {
                         // Gửi request tạo mới cho từng cặp tương tác
                         await Promise.all(
                             validInteractions.map((interaction) => {
-                                interaction.id = "ahihi"; // Thêm id ngẫu nhiên
+                                interaction.id = ""; // Thêm id ngẫu nhiên
                                 console.log(interaction);
                                 return ddiService.create(interaction);
                             })

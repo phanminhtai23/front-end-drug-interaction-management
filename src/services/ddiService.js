@@ -9,7 +9,7 @@ const ddiService = {
 
     // Tạo mới thông tin tương tác thuốc
     create: (ddi) => {
-        return axiosClient.post("/ddi", 1);
+        return axiosClient.post("/ddi", ddi);
     },
 
     // Lấy chi tiết tương tác thuốc
